@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool oTrun = true;
   List<String> displayOX = ['', '', '', '', '', '', '', '', ''];
+  List<int> matchedIndexes = [];
   int attempts = 0;
 
   int oScore = 0;
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: Styles.colorBlueGrey,
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
+          padding: EdgeInsets.symmetric(horizontal: 15),
           child: Column(
             children: [
               const SizedBox(height: 20),
@@ -103,7 +104,9 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Styles.colorWhite,
+                            color: matchedIndexes.contains(index)
+                                ? Styles.colorGreen
+                                : Styles.colorWhite,
                             borderRadius: BorderRadius.circular(15),
                             border: Border.all(
                                 width: 5, color: Styles.colorBlueGrey)),
@@ -129,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                       style: Styles.textPriamry,
                     ),
                     // const SizedBox(height: 40),
-                    _buildTimer()
+                    _buildTimer(),
                   ],
                 ),
               ),
@@ -168,8 +171,9 @@ class _HomePageState extends State<HomePage> {
         displayOX[0] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[0] + ' Wins!';
+        matchedIndexes.addAll([0, 1, 2]);
+        stopTimer();
         _updateWin(displayOX[0]);
-        // stopTimer();
       });
     }
 
@@ -179,6 +183,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[3] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[3] + ' Wins!';
+        matchedIndexes.addAll([3, 4, 5]);
+        stopTimer();
         _updateWin(displayOX[3]);
       });
     }
@@ -189,6 +195,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[6] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[6] + ' Wins!';
+        matchedIndexes.addAll([6, 7, 8]);
+        stopTimer();
         _updateWin(displayOX[6]);
       });
     }
@@ -199,6 +207,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[0] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[0] + ' Wins!';
+        matchedIndexes.addAll([0, 3, 6]);
+        stopTimer();
         _updateWin(displayOX[0]);
       });
     }
@@ -209,6 +219,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[1] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[1] + ' Wins!';
+        matchedIndexes.addAll([1, 4, 7]);
+        stopTimer();
         _updateWin(displayOX[1]);
       });
     }
@@ -219,6 +231,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[2] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[2] + ' Wins!';
+        matchedIndexes.addAll([2, 5, 8]);
+        stopTimer();
         _updateWin(displayOX[2]);
       });
     }
@@ -229,6 +243,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[0] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[0] + ' Wins!';
+        matchedIndexes.addAll([0, 4, 8]);
+        stopTimer();
         _updateWin(displayOX[0]);
       });
     }
@@ -239,6 +255,8 @@ class _HomePageState extends State<HomePage> {
         displayOX[6] != '') {
       setState(() {
         resultDeclaration = 'Player ' + displayOX[6] + ' Wins!';
+        matchedIndexes.addAll([6, 4, 2]);
+        stopTimer();
         _updateWin(displayOX[6]);
       });
     }
@@ -270,10 +288,12 @@ class _HomePageState extends State<HomePage> {
       resultDeclaration = '';
     });
     filledBoxs = 0;
+    matchedIndexes = [];
   }
 
   Widget _buildTimer() {
     final isRuning = timer == null ? false : timer!.isActive;
+
     return isRuning
         ? SizedBox(
             height: 100,
@@ -299,10 +319,11 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               startTimer();
               _clearBoard();
+              attempts++;
             },
             color: Styles.colorGreen,
             child: Text(
-              'Play Again!',
+              attempts == 0 ? 'Start Game' : 'Play Again!',
               style: Styles.textPriamry.copyWith(
                   fontSize: 18, fontFamily: '', fontWeight: FontWeight.w600),
             ),
