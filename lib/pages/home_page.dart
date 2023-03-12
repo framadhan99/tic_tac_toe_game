@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:tic_tac_toe_game/main.dart';
 import 'package:tic_tac_toe_game/utils/styles.dart';
 
 class HomePage extends StatefulWidget {
@@ -11,6 +14,36 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool oTrun = true;
   List<String> displayOX = ['', '', '', '', '', '', '', '', ''];
+  int attempts = 0;
+
+  int oScore = 0;
+  int xScore = 0;
+  int filledBoxs = 0;
+  String resultDeclaration = '';
+  bool winnerFound = false;
+
+  static const maxSecond = 30;
+  int second = maxSecond;
+  Timer? timer;
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (second > 0) {
+          second--;
+        } else {
+          stopTimer();
+        }
+      });
+    });
+  }
+
+  void stopTimer() {
+    resetTimer();
+    timer?.cancel();
+  }
+
+  void resetTimer() => second = maxSecond;
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +54,41 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.symmetric(horizontal: 10),
           child: Column(
             children: [
+              const SizedBox(height: 20),
               Expanded(
                 flex: 1,
-                child: Center(child: Text('Score Board')),
+                child: Container(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          'Player O',
+                          style: Styles.textPriamry,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          oScore.toString(),
+                          style: Styles.textPriamry,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          'Player X',
+                          style: Styles.textPriamry,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          xScore.toString(),
+                          style: Styles.textPriamry,
+                        ),
+                      ],
+                    )
+                  ],
+                )),
               ),
               Expanded(
                 flex: 3,
@@ -54,8 +119,19 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Expanded(
-                flex: 1,
-                child: Text('Timer'),
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    // const SizedBox(height: 30),
+                    Text(
+                      resultDeclaration,
+                      style: Styles.textPriamry,
+                    ),
+                    // const SizedBox(height: 40),
+                    _buildTimer()
+                  ],
+                ),
               ),
             ],
           ),
@@ -66,14 +142,170 @@ class _HomePageState extends State<HomePage> {
 
   // tapped tic tac toe
   void _tapped(int index) {
-    setState(() {
-      if (oTrun && displayOX[index] == '') {
-        displayOX[index] = 'O';
-      } else {
-        displayOX[index] = 'X';
-      }
+    final isRuning = timer == null ? false : timer!.isActive;
 
-      oTrun = !oTrun;
+    if (isRuning) {
+      setState(() {
+        if (oTrun && displayOX[index] == '') {
+          displayOX[index] = 'O';
+          filledBoxs++;
+        } else if (!oTrun && displayOX[index] == '') {
+          displayOX[index] = 'X';
+          filledBoxs++;
+        }
+
+        oTrun = !oTrun;
+        _checkWinner();
+      });
+    }
+  }
+
+  // check winner
+  void _checkWinner() {
+    // check 1st row
+    if (displayOX[0] == displayOX[1] &&
+        displayOX[0] == displayOX[2] &&
+        displayOX[0] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[0] + ' Wins!';
+        _updateWin(displayOX[0]);
+        // stopTimer();
+      });
+    }
+
+    // check 2nd row
+    if (displayOX[3] == displayOX[4] &&
+        displayOX[3] == displayOX[5] &&
+        displayOX[3] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[3] + ' Wins!';
+        _updateWin(displayOX[3]);
+      });
+    }
+
+    // check 3rd row
+    if (displayOX[6] == displayOX[7] &&
+        displayOX[6] == displayOX[8] &&
+        displayOX[6] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[6] + ' Wins!';
+        _updateWin(displayOX[6]);
+      });
+    }
+
+    // check 1st column
+    if (displayOX[0] == displayOX[3] &&
+        displayOX[0] == displayOX[6] &&
+        displayOX[0] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[0] + ' Wins!';
+        _updateWin(displayOX[0]);
+      });
+    }
+
+    // check 2nd Column
+    if (displayOX[1] == displayOX[4] &&
+        displayOX[1] == displayOX[7] &&
+        displayOX[1] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[1] + ' Wins!';
+        _updateWin(displayOX[1]);
+      });
+    }
+
+    // check 3rd column
+    if (displayOX[2] == displayOX[5] &&
+        displayOX[2] == displayOX[8] &&
+        displayOX[2] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[2] + ' Wins!';
+        _updateWin(displayOX[2]);
+      });
+    }
+
+    // check diagonal
+    if (displayOX[0] == displayOX[4] &&
+        displayOX[0] == displayOX[8] &&
+        displayOX[0] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[0] + ' Wins!';
+        _updateWin(displayOX[0]);
+      });
+    }
+
+    // check diagonal
+    if (displayOX[6] == displayOX[4] &&
+        displayOX[6] == displayOX[2] &&
+        displayOX[6] != '') {
+      setState(() {
+        resultDeclaration = 'Player ' + displayOX[6] + ' Wins!';
+        _updateWin(displayOX[6]);
+      });
+    }
+
+    // check nobody winner
+    if (!winnerFound && filledBoxs == 9) {
+      setState(() {
+        resultDeclaration = 'Nobody Wins!';
+      });
+    }
+  }
+
+  // update winner
+  void _updateWin(String winner) {
+    if (winner == 'O') {
+      oScore++;
+    } else if (winner == 'X') {
+      xScore++;
+    }
+    winnerFound = true;
+  }
+
+  // clear Board
+  void _clearBoard() {
+    setState(() {
+      for (int i = 0; i < 9; i++) {
+        displayOX[i] = '';
+      }
+      resultDeclaration = '';
     });
+    filledBoxs = 0;
+  }
+
+  Widget _buildTimer() {
+    final isRuning = timer == null ? false : timer!.isActive;
+    return isRuning
+        ? SizedBox(
+            height: 100,
+            width: 100,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                CircularProgressIndicator(
+                  value: 1 - second / maxSecond,
+                  valueColor: AlwaysStoppedAnimation(Colors.white),
+                  strokeWidth: 8,
+                  backgroundColor: Styles.colorGreen,
+                ),
+                Center(
+                    child: Text(
+                  second.toString(),
+                  style: Styles.textPriamry,
+                ))
+              ],
+            ),
+          )
+        : MaterialButton(
+            onPressed: () {
+              startTimer();
+              _clearBoard();
+            },
+            color: Styles.colorGreen,
+            child: Text(
+              'Play Again!',
+              style: Styles.textPriamry.copyWith(
+                  fontSize: 18, fontFamily: '', fontWeight: FontWeight.w600),
+            ),
+          );
   }
 }
